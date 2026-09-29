@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>INSYS PRO v4.0 — Advanced Stock Market Intelligence</title>
+    <meta name="description" content="Professional-grade stock intelligence platform analyzing 100+ NIFTY equities with 50+ technical indicators, Random Forest ML predictions, and real-time signals.">
+    <meta name="theme-color" content="#0a0a0f">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%3E%3Ctext y=%2226%22 font-size=%2226%22>🚀</text></svg>">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Three.js 3D Background Engine -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Three.js 3D Canvas Canvas -->
+    <canvas id="bg-canvas"></canvas>
+
+    <!-- App Container -->
+    <div id="app-container">
+        <!-- Mobile Drawer Backdrop -->
+        <div id="sidebar-backdrop" class="sidebar-backdrop"></div>
+
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-badge">
+                    <span class="brand-icon">🚀</span>
+                    <div class="brand-text">
+                        <span class="brand-title">INSYS PRO</span>
+                        <span class="brand-version">v4.0 INTELLIGENCE</span>
+                    </div>
+                </div>
+                <button class="sidebar-close-btn" id="sidebar-close-btn" aria-label="Close navigation">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <button class="nav-item active" data-view="view-dashboard">
+                    <i data-lucide="layout-dashboard"></i>
+                    <span>Dashboard</span>
+                </button>
+                <button class="nav-item" data-view="view-stocks">
+                    <i data-lucide="trending-up"></i>
+                    <span>Stocks</span>
+                    <span class="badge-pill" id="sidebar-stock-count">100</span>
+                </button>
+                <button class="nav-item" data-view="view-predictions">
+                    <i data-lucide="cpu"></i>
+                    <span>ML Predictions</span>
+                    <span class="badge-dot-green"></span>
+                </button>
+                <button class="nav-item" data-view="view-education">
+                    <i data-lucide="book-open"></i>
+                    <span>Education</span>
+                </button>
+                <button class="nav-item" data-view="view-settings">
+                    <i data-lucide="settings"></i>
+                    <span>Settings</span>
+                </button>
+            </nav>
+
+            <div class="sidebar-footer">
+                <div class="engine-status-card">
+                    <div class="status-indicator">
+                        <span class="pulse-dot" id="system-status-dot"></span>
+                        <span class="status-text" id="system-status-text">STATUS: CONNECTING</span>
+                    </div>
+                    <div class="status-details">
+                        <span id="market-status-badge">NSE: ACTIVE</span>
+                        <span id="system-mode-tag" class="mode-tag live">LIVE</span>
+                    </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main id="main-content">
+            <!-- Topbar Header -->
+            <header id="topbar">
+                <div class="topbar-left">
+                    <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Open navigation menu">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div class="title-group">
+                        <h1 class="page-title">🚀 INSYS PRO</h1>
+                        <p class="page-subtitle">Advanced Stock Intelligence · 50+ Indicators · <span id="header-count">50</span> stocks</p>
+                    </div>
+                </div>
+
+                <div class="topbar-right">
+                    <!-- Live Clock -->
+                    <div class="clock-display" id="clock-display">
+                        <div class="clock-date" id="live-date">Sat Sep 06, 2026</div>
+                        <div class="clock-time" id="live-time">20:00:00 IST</div>
+                    </div>
+
+                    <!-- 5G Badge -->
+                    <div class="tech-badge" title="Ultra-low latency streaming protocol">
+                        <i data-lucide="zap"></i>
+                        <span>5G FAST</span>
+                    </div>
+
+                    <!-- Status Pill -->
+                    <div class="status-pill live" id="top-status-pill">
+                        <span class="status-dot"></span>
+                        <span id="top-status-label">LIVE</span>
+                    </div>
+
+                    <!-- Auto Refresh Toggle & Countdown -->
+                    <div class="auto-refresh-box">
+                        <label class="switch">
+                            <input type="checkbox" id="auto-refresh-toggle" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <div class="refresh-countdown">
+                            <span class="countdown-label">Auto:</span>
+                            <span class="countdown-seconds" id="countdown-timer">10s</span>
+                        </div>
+                    </div>
+
+                    <!-- Manual Refresh Button -->
+                    <button class="action-btn" id="btn-refresh" title="Force Intelligence Refresh">
+                        <i data-lucide="refresh-cw" id="refresh-icon"></i>
+                        <span>Refresh</span>
+                    </button>
+
+                    <!-- Sound Toggle -->
+                    <button class="icon-btn" id="btn-sound-toggle" title="Toggle Sound Feedback">
+                        <i data-lucide="volume-2" id="sound-icon"></i>
+                    </button>
+
+                    <!-- User Avatar -->
+                    <div class="user-avatar" title="INSYS Pro Analyst">
+                        <span>IP</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Global Stock Ticker Strip -->
+            <div id="ticker-bar">
+                <div class="ticker-label">
+                    <i data-lucide="activity"></i>
+                    <span>NIFTY 100 LIVE</span>
+                </div>
+                <div class="ticker-marquee-wrapper">
+                    <div class="ticker-track" id="ticker-track">
+                        <!-- Populated by JavaScript -->
+                        <div class="ticker-item">Loading live market quotes...</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content Views Container -->
+            <div id="views-wrapper">
+                <!-- ============================================================ -->
+                <!-- VIEW 1: DASHBOARD -->
+                <!-- ============================================================ -->
+                <section id="view-dashboard" class="content-view active">
+                    <!-- 4 Top Stat Cards -->
+                    <div class="stats-grid">
+                        <!-- Stat Card 1: Top Pick -->
+                        <div class="glass-card stat-card" id="card-top-pick">
+                            <div class="card-icon-wrapper fire">
+                                <i data-lucide="flame"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">🔥 Top Pick</div>
+                                <div class="stat-main-val" id="stat-top-symbol">RELIANCE</div>
+                                <div class="stat-sub-val" id="stat-top-signal">BUY 92%</div>
+                                <div class="stat-desc" id="stat-top-reason">RSI Oversold · MACD Bullish</div>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 2: Market Sentiment -->
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper chart">
+                                <i data-lucide="pie-chart"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">📊 Sentiment</div>
+                                <div class="stat-main-val" id="stat-sentiment">Bullish</div>
+                                <div class="stat-sub-val" id="stat-sentiment-pct">60% BUY</div>
+                                <div class="stat-desc" id="stat-sentiment-desc">Strong Institutional Inflow</div>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 3: Market Risk -->
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper shield">
+                                <i data-lucide="shield-check"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">🛡️ Risk</div>
+                                <div class="stat-main-val" id="stat-risk">LOW</div>
+                                <div class="stat-sub-val" id="stat-risk-metrics">ATR Vol: 1.8%</div>
+                                <div class="stat-desc" id="stat-risk-desc">Optimal Risk/Reward Zone</div>
+                            </div>
+                        </div>
+
+                        <!-- Stat Card 4: Total Stocks -->
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper trending">
+                                <i data-lucide="layers"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">📈 Total Stocks</div>
+                                <div class="stat-main-val" id="stat-total-count">50</div>
+                                <div class="stat-sub-val" id="stat-buy-count">25 BUY</div>
+                                <div class="stat-desc" id="stat-sell-count">12 Hold · 13 Sell</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Top 5 Recommendations Section -->
+                    <div class="section-container">
+                        <div class="section-header">
+                            <div class="section-title-wrap">
+                                <h2 class="section-title">
+                                    <i data-lucide="award"></i>
+                                    Top 5 Algorithmic Recommendations
+                                </h2>
+                                <p class="section-desc">Ranked by multi-factor confidence and quantitative edge</p>
+                            </div>
+                            <button class="text-btn" id="btn-view-all-buys">
+                                <span>View all BUY opportunities</span>
+                                <i data-lucide="arrow-right"></i>
+                            </button>
+                        </div>
+
+                        <div class="top5-grid" id="top5-container">
+                            <!-- Populated dynamically -->
+                            <div class="glass-card skeleton-card">Loading top picks...</div>
+                        </div>
+                    </div>
+
+                    <!-- Dual Column: SHAP Feature Importance & Market Watchlist -->
+                    <div class="dashboard-split-grid">
+                        <!-- SHAP Analysis Card -->
+                        <div class="glass-card feature-importance-card">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3 class="card-title">
+                                        <i data-lucide="brain"></i>
+                                        SHAP Analysis & Feature Attribution
+                                    </h3>
+                                    <p class="card-subtitle">Random Forest ML decision weights across technical inputs</p>
+                                </div>
+                                <span class="badge-pill purple">RF Engine</span>
+                            </div>
+
+                            <div class="shap-bars-container" id="shap-bars-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Watchlist Card -->
+                        <div class="glass-card watchlist-card">
+                            <div class="card-header-flex">
+                                <div>
+                                    <h3 class="card-title">
+                                        <i data-lucide="crosshair"></i>
+                                        Institutional Momentum Watchlist
+                                    </h3>
+                                    <p class="card-subtitle">Symbols exhibiting volume breakouts & golden crossovers</p>
+                                </div>
+                                <span class="badge-pill cyan">Live Moats</span>
+                            </div>
+
+                            <div class="watchlist-list" id="watchlist-quick-list">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- VIEW 2: STOCKS INTELLIGENCE -->
+                <!-- ============================================================ -->
+                <section id="view-stocks" class="content-view">
+                    <!-- Filters & Search Toolbar -->
+                    <div class="glass-card filter-toolbar">
+                        <!-- Search Box -->
+                        <div class="search-box">
+                            <i data-lucide="search"></i>
+                            <input type="text" id="stocks-search-input" placeholder="Search by symbol, company name, or sector...">
+                            <button class="clear-search-btn" id="clear-search-btn" title="Clear">
+                                <i data-lucide="x"></i>
+                            </button>
+                        </div>
+
+                        <!-- Filter Controls Flex -->
+                        <div class="filters-row">
+                            <!-- Signal Pills -->
+                            <div class="filter-pills" id="signal-filter-group">
+                                <button class="filter-pill active" data-signal="ALL">ALL</button>
+                                <button class="filter-pill strong-buy" data-signal="STRONG BUY">STRONG BUY</button>
+                                <button class="filter-pill buy" data-signal="BUY">BUY</button>
+                                <button class="filter-pill hold" data-signal="HOLD">HOLD</button>
+                                <button class="filter-pill sell" data-signal="SELL">SELL</button>
+                                <button class="filter-pill strong-sell" data-signal="STRONG SELL">STRONG SELL</button>
+                            </div>
+
+                            <!-- Sector Dropdown -->
+                            <div class="select-wrapper">
+                                <select id="sector-filter-select">
+                                    <option value="ALL">All Sectors</option>
+                                    <option value="IT">Information Tech</option>
+                                    <option value="Financial Services">Financial Services</option>
+                                    <option value="Energy">Energy</option>
+                                    <option value="Automobile">Automobile</option>
+                                    <option value="FMCG">FMCG</option>
+                                    <option value="Healthcare">Healthcare</option>
+                                    <option value="Metals & Mining">Metals & Mining</option>
+                                    <option value="Consumer Durables">Consumer Durables</option>
+                                    <option value="Utilities">Utilities</option>
+                                    <option value="Capital Goods">Capital Goods</option>
+                                </select>
+                            </div>
+
+                            <!-- Sort Selector -->
+                            <div class="select-wrapper">
+                                <select id="stocks-sort-select">
+                                    <option value="confidence_desc">Highest Confidence</option>
+                                    <option value="confidence_asc">Lowest Confidence</option>
+                                    <option value="change_desc">Top Gainers</option>
+                                    <option value="change_asc">Top Losers</option>
+                                    <option value="price_desc">Price: High to Low</option>
+                                    <option value="symbol_asc">Symbol: A to Z</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Stocks Results Header -->
+                    <div class="results-meta-bar">
+                        <span class="results-count">Showing <b id="filtered-stocks-count">0</b> equities</span>
+                        <div class="view-switch">
+                            <button class="view-mode-btn active" id="btn-mode-grid" title="Card Grid View">
+                                <i data-lucide="grid"></i>
+                            </button>
+                            <button class="view-mode-btn" id="btn-mode-table" title="Compact Table View">
+                                <i data-lucide="table"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Stocks Grid Container -->
+                    <div class="stocks-grid-view" id="stocks-container">
+                        <!-- Populated by script.js -->
+                    </div>
+
+                    <!-- Stocks Table View (hidden by default) -->
+                    <div class="stocks-table-wrapper" id="stocks-table-container" style="display: none;">
+                        <table class="glass-table">
+                            <thead>
+                                <tr>
+                                    <th>#</th>
+                                    <th>Symbol</th>
+                                    <th>Sector</th>
+                                    <th>Price</th>
+                                    <th>Change</th>
+                                    <th>Signal</th>
+                                    <th>Confidence</th>
+                                    <th>Risk</th>
+                                    <th>Top Reason</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody id="stocks-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- VIEW 3: ML PREDICTIONS -->
+                <!-- ============================================================ -->
+                <section id="view-predictions" class="content-view">
+                    <!-- ML Architecture Stats Header -->
+                    <div class="stats-grid">
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper purple">
+                                <i data-lucide="binary"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Model Architecture</div>
+                                <div class="stat-main-val">Random Forest</div>
+                                <div class="stat-sub-val">45 Estimators · Depth 5</div>
+                                <div class="stat-desc">Multi-Feature Classifier</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper green">
+                                <i data-lucide="target"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Prediction Accuracy</div>
+                                <div class="stat-main-val">84.2%</div>
+                                <div class="stat-sub-val">Cross-Validated</div>
+                                <div class="stat-desc">5-Day Forward Return</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper cyan">
+                                <i data-lucide="compass"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">Dominant Market Trend</div>
+                                <div class="stat-main-val" id="ml-dominant-trend">UPTREND</div>
+                                <div class="stat-sub-val" id="ml-trend-counts">65% of Universe</div>
+                                <div class="stat-desc">Stochastic Drift Positive</div>
+                            </div>
+                        </div>
+
+                        <div class="glass-card stat-card">
+                            <div class="card-icon-wrapper fire">
+                                <i data-lucide="sparkles"></i>
+                            </div>
+                            <div class="stat-content">
+                                <div class="stat-label">High Conviction Picks</div>
+                                <div class="stat-main-val" id="ml-high-conviction-count">18</div>
+                                <div class="stat-sub-val">> 80% ML Confidence</div>
+                                <div class="stat-desc">Institutional Confluence</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Predictions Table & Matrix -->
+                    <div class="section-container">
+                        <div class="section-header">
+                            <div>
+                                <h2 class="section-title">
+                                    <i data-lucide="cpu"></i>
+                                    Predictive Machine Learning Matrix
+                                </h2>
+                                <p class="section-desc">Next-day probability distributions and automated trend classification</p>
+                            </div>
+                        </div>
+
+                        <div class="glass-card table-card">
+                            <div class="table-responsive">
+                                <table class="glass-table">
+                                    <thead>
+                                        <tr>
+                                            <th>Symbol</th>
+                                            <th>Current Price</th>
+                                            <th>Predicted Trend</th>
+                                            <th>ML Confidence</th>
+                                            <th>Next Day Up Prob</th>
+                                            <th>Next Day Neutral</th>
+                                            <th>Next Day Down Prob</th>
+                                            <th>Engine Status</th>
+                                            <th>Inspect</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="ml-predictions-table-body">
+                                        <!-- Populated dynamically -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- VIEW 4: EDUCATION & METHODOLOGY -->
+                <!-- ============================================================ -->
+                <section id="view-education" class="content-view">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">
+                                <i data-lucide="graduation-cap"></i>
+                                Technical Indicator Masterclass & Methodology
+                            </h2>
+                            <p class="section-desc">Comprehensive reference guide to the 50+ quantitative indicators powering INSYS PRO v4.0</p>
+                        </div>
+                    </div>
+
+                    <div class="education-grid">
+                        <!-- Trend Indicators -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box purple"><i data-lucide="trending-up"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Trend Indicators (12)</h3>
+                                    <span class="edu-tag">Macro & Directional</span>
+                                </div>
+                            </div>
+                            <ul class="edu-list">
+                                <li><b>SMA (20, 50, 200):</b> Moving averages tracking dynamic short, medium, and long-term institutional support levels.</li>
+                                <li><b>EMA (12, 26, 50):</b> Exponential moving averages giving greater weight to recent price discovery.</li>
+                                <li><b>Ichimoku Cloud:</b> Comprehensive equilibrium system utilizing Tenkan-sen, Kijun-sen, Senkou Span A & B.</li>
+                                <li><b>Supertrend & Parabolic SAR:</b> Trailing volatility stop mechanisms identifying regime breaks.</li>
+                                <li><b>ADX (+DI / -DI):</b> Quantifies directional trend intensity on a 0–100 scale.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Momentum Indicators -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box cyan"><i data-lucide="zap"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Momentum Oscillators (10)</h3>
+                                    <span class="edu-tag">Velocity & Overbought/Oversold</span>
+                                </div>
+                            </div>
+                            <ul class="edu-list">
+                                <li><b>RSI (Relative Strength Index):</b> Measures velocity of price moves. Readings &lt; 30 flag oversold bottoms; &gt; 70 flag overbought tops.</li>
+                                <li><b>MACD (12, 26, 9):</b> Moving Average Convergence Divergence line, signal line, and histogram momentum spreads.</li>
+                                <li><b>Stochastic Oscillator (%K, %D):</b> Compares closing price against price range over 14 periods.</li>
+                                <li><b>Money Flow Index (MFI):</b> Volume-weighted momentum indicator identifying buying pressure.</li>
+                                <li><b>Williams %R & CCI:</b> Commodity Channel Index and extreme range oscillators.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Volatility Indicators -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box green"><i data-lucide="activity"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Volatility & Bands (9)</h3>
+                                    <span class="edu-tag">Standard Deviation & Squeeze</span>
+                                </div>
+                            </div>
+                            <ul class="edu-list">
+                                <li><b>Bollinger Bands (20, 2):</b> Upper, Middle, and Lower bands measuring 2 standard deviations.</li>
+                                <li><b>Bollinger %B & Bandwidth:</b> Quantifies price position within bands and identifies explosive volatility squeezes.</li>
+                                <li><b>ATR (Average True Range):</b> Measures absolute volatility in currency units for stop sizing.</li>
+                                <li><b>Keltner & Donchian Channels:</b> Channel boundaries based on exponential averages and multi-period extremes.</li>
+                                <li><b>Historical Volatility (30d):</b> Annualized log return variance.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Volume Indicators -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box fire"><i data-lucide="bar-chart-2"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Volume & Flow (9)</h3>
+                                    <span class="edu-tag">Institutional Footprints</span>
+                                </div>
+                            </div>
+                            <ul class="edu-list">
+                                <li><b>VWAP (Volume Weighted Avg Price):</b> The true institutional transaction benchmark.</li>
+                                <li><b>OBV (On-Balance Volume):</b> Cumulative volume flow preceding price direction.</li>
+                                <li><b>Volume Spike Detection:</b> Triggers when current volume surges &ge; 40% above 20-day SMA.</li>
+                                <li><b>Chaikin Money Flow (CMF):</b> Quantifies accumulation/distribution pressure over 20 bars.</li>
+                                <li><b>Ease of Movement (EOM) & ADL:</b> Relationship between volume and price displacement.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Advanced & Fibonacci -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box purple"><i data-lucide="maximize-2"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Advanced Levels & Fibonacci (10)</h3>
+                                    <span class="edu-tag">Mathematical Harmonics</span>
+                                </div>
+                            </div>
+                            <ul class="edu-list">
+                                <li><b>Fibonacci Retracement (61.8%, 50%, 38.2%):</b> Golden ratio support & resistance zones calculated from swing extremes.</li>
+                                <li><b>Classic & Fibonacci Pivot Points:</b> PP, R1–R3, S1–S3 intraday predictive boundaries.</li>
+                                <li><b>Sharpe Ratio & Beta:</b> Risk-adjusted performance relative to Indian 10-year G-Sec yield and market benchmark.</li>
+                                <li><b>Max Drawdown (MDD):</b> Peak-to-trough capital decline over 250 trading sessions.</li>
+                            </ul>
+                        </div>
+
+                        <!-- Signal Logic -->
+                        <div class="glass-card edu-card">
+                            <div class="edu-card-header">
+                                <div class="edu-icon-box cyan"><i data-lucide="check-circle-2"></i></div>
+                                <div>
+                                    <h3 class="edu-title">Signal Classification Rules</h3>
+                                    <span class="edu-tag">Quantitative Synthesis</span>
+                                </div>
+                            </div>
+                            <div class="signal-rule-item">
+                                <span class="badge-pill strong-buy">STRONG BUY</span>
+                                <span>Confidence &ge; 85% · Confluence across Trend, Oversold Momentum, and Volume Surge</span>
+                            </div>
+                            <div class="signal-rule-item">
+                                <span class="badge-pill buy">BUY</span>
+                                <span>Confidence 70–84% · Confirmed breakout or support bounce above key moving averages</span>
+                            </div>
+                            <div class="signal-rule-item">
+                                <span class="badge-pill hold">HOLD</span>
+                                <span>Confidence 45–69% · Consolidation zone or neutral oscillator status</span>
+                            </div>
+                            <div class="signal-rule-item">
+                                <span class="badge-pill sell">SELL</span>
+                                <span>Confidence 30–44% · Deteriorating momentum, breakdown below moving averages</span>
+                            </div>
+                            <div class="signal-rule-item">
+                                <span class="badge-pill strong-sell">STRONG SELL</span>
+                                <span>Confidence &lt; 30% · Heavy institutional distribution and bearish crossovers</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- ============================================================ -->
+                <!-- VIEW 5: SETTINGS -->
+                <!-- ============================================================ -->
+                <section id="view-settings" class="content-view">
+                    <div class="section-header">
+                        <div>
+                            <h2 class="section-title">
+                                <i data-lucide="sliders"></i>
+                                System Preferences & Engine Configuration
+                            </h2>
+                            <p class="section-desc">Customize data refresh frequencies, network simulation, audio alerts, and currency</p>
+                        </div>
+                    </div>
+
+                    <div class="settings-grid">
+                        <div class="glass-card settings-card">
+                            <h3 class="settings-section-title">Streaming & Refresh Rates</h3>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">Auto-Refresh Interval</div>
+                                    <div class="setting-desc">Cadence for polling stock quotes and recalculating signals</div>
+                                </div>
+                                <select id="setting-refresh-interval" class="setting-select">
+                                    <option value="5">5 Seconds (Ultra)</option>
+                                    <option value="10" selected>10 Seconds (Standard)</option>
+                                    <option value="30">30 Seconds (Balanced)</option>
+                                    <option value="60">60 Seconds (Low Bandwidth)</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">Simulate Fallback Engine</div>
+                                    <div class="setting-desc">Force offline synthetic stochastic dataset for testing</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="setting-force-fallback">
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="glass-card settings-card">
+                            <h3 class="settings-section-title">Audio & Interface Feedback</h3>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">Audio Synthesis Alert</div>
+                                    <div class="setting-desc">Synthesized harmonic chime on refresh and strong signal detections</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="setting-audio-alerts" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">Currency Display</div>
+                                    <div class="setting-desc">Base denomination for quotes and pivot levels</div>
+                                </div>
+                                <select id="setting-currency-select" class="setting-select">
+                                    <option value="INR" selected>₹ Indian Rupee (INR)</option>
+                                    <option value="USD">$ US Dollar (USD)</option>
+                                </select>
+                            </div>
+
+                            <div class="setting-item">
+                                <div class="setting-info">
+                                    <div class="setting-title">Three.js 3D Background</div>
+                                    <div class="setting-desc">Particle constellation rendering in dark space</div>
+                                </div>
+                                <label class="switch">
+                                    <input type="checkbox" id="setting-3d-bg" checked>
+                                    <span class="slider"></span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <!-- Regulatory Disclaimer Panel -->
+                        <div class="glass-card settings-card full-width">
+                            <h3 class="settings-section-title">
+                                <i data-lucide="alert-triangle" class="icon-warning"></i>
+                                Statutory Compliance & Regulatory Disclaimer
+                            </h3>
+                            <div class="disclaimer-content">
+                                <p>⚠️ <b>EDUCATIONAL AND RESEARCH USE ONLY:</b> INSYS PRO v4.0 is an automated algorithmic research system designed strictly for educational and technical market analysis. Nothing contained herein constitutes investment advice, financial guidance, endorsement, or recommendation of any security or trading strategy.</p>
+                                <p>⚠️ <b>SEBI COMPLIANCE:</b> The authors, developers, and operators are NOT registered investment advisors with SEBI (Securities and Exchange Board of India). Always consult a licensed and SEBI-registered financial advisor before making any financial commitments.</p>
+                                <p>⚠️ <b>MARKET RISK:</b> Equity trading and derivatives involve substantial risk of capital loss. Past statistical performance, indicator confluences, and Random Forest machine learning models do not guarantee future returns. Never allocate funds you cannot afford to lose.</p>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+
+            <!-- Regulatory Footer -->
+            <footer id="app-footer">
+                <div class="footer-left">
+                    <span>🚀 <b>INSYS PRO v4.0</b> · Quantitative Market Intelligence Platform</span>
+                </div>
+                <div class="footer-right">
+                    <span>SEBI Disclaimer Applicable · Real-time Technical Synthesis · Built with Python & Three.js</span>
+                </div>
+            </footer>
+        </main>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- COMPREHENSIVE STOCK DETAIL MODAL (50+ INDICATORS) -->
+    <!-- ============================================================ -->
+    <div id="stock-modal" class="modal-overlay">
+        <div class="modal-dialog glass-card">
+            <!-- Modal Header -->
+            <div class="modal-header">
+                <div class="modal-title-group">
+                    <div class="modal-symbol-badge" id="modal-symbol-badge">RE</div>
+                    <div>
+                        <div class="modal-title-row">
+                            <h2 class="modal-symbol" id="modal-symbol">RELIANCE</h2>
+                            <span class="badge-pill live" id="modal-signal-badge">STRONG BUY</span>
+                            <span class="modal-confidence-text" id="modal-confidence-text">92% CONFIDENCE</span>
+                        </div>
+                        <p class="modal-name-sector">
+                            <span id="modal-company-name">Reliance Industries Ltd</span> · 
+                            <span id="modal-sector">Energy</span>
+                        </p>
+                    </div>
+                </div>
+
+                <div class="modal-price-group">
+                    <div class="modal-price" id="modal-price">₹2,945.50</div>
+                    <div class="modal-change positive" id="modal-change">+₹65.20 (+2.30%)</div>
+                    <button class="modal-close-btn" id="modal-close-btn">
+                        <i data-lucide="x"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Top 5 Reasons Banner -->
+            <div class="modal-reasons-banner">
+                <div class="reasons-banner-title">
+                    <i data-lucide="check-circle-2"></i>
+                    <span>Top 5 Algorithmic Drivers for Current Signal:</span>
+                </div>
+                <ul class="reasons-list" id="modal-reasons-list">
+                    <!-- Populated dynamically -->
+                </ul>
+            </div>
+
+            <!-- Modal Tab Navigation -->
+            <div class="modal-tabs-nav">
+                <button class="modal-tab-btn active" data-tab="tab-trend">
+                    <i data-lucide="trending-up"></i>
+                    <span>Trend (12)</span>
+                </button>
+                <button class="modal-tab-btn" data-tab="tab-momentum">
+                    <i data-lucide="zap"></i>
+                    <span>Momentum (10)</span>
+                </button>
+                <button class="modal-tab-btn" data-tab="tab-volatility">
+                    <i data-lucide="activity"></i>
+                    <span>Volatility (9)</span>
+                </button>
+                <button class="modal-tab-btn" data-tab="tab-volume">
+                    <i data-lucide="bar-chart-2"></i>
+                    <span>Volume (9)</span>
+                </button>
+                <button class="modal-tab-btn" data-tab="tab-levels">
+                    <i data-lucide="maximize-2"></i>
+                    <span>Levels & Risk (10)</span>
+                </button>
+                <button class="modal-tab-btn" data-tab="tab-ml">
+                    <i data-lucide="cpu"></i>
+                    <span>ML Forecast</span>
+                </button>
+            </div>
+
+            <!-- Modal Tab Panels -->
+            <div class="modal-tab-content">
+                <!-- Tab 1: Trend Indicators -->
+                <div id="tab-trend" class="modal-tab-pane active">
+                    <div class="indicators-metric-grid" id="grid-trend-indicators">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 2: Momentum Indicators -->
+                <div id="tab-momentum" class="modal-tab-pane">
+                    <div class="indicators-metric-grid" id="grid-momentum-indicators">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 3: Volatility Indicators -->
+                <div id="tab-volatility" class="modal-tab-pane">
+                    <div class="indicators-metric-grid" id="grid-volatility-indicators">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 4: Volume Indicators -->
+                <div id="tab-volume" class="modal-tab-pane">
+                    <div class="indicators-metric-grid" id="grid-volume-indicators">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+                <!-- Tab 5: Levels & Fibonacci -->
+                <div id="tab-levels" class="modal-tab-pane">
+                    <div class="levels-split-grid">
+                        <!-- Fibonacci Table -->
+                        <div class="levels-card">
+                            <h4 class="levels-card-title">Fibonacci Retracements (52W Range)</h4>
+                            <table class="levels-table" id="modal-fib-table">
+                                <!-- Populated dynamically -->
+                            </table>
+                        </div>
+
+                        <!-- Classic & Fib Pivots -->
+                        <div class="levels-card">
+                            <h4 class="levels-card-title">Daily Pivot Boundaries</h4>
+                            <table class="levels-table" id="modal-pivots-table">
+                                <!-- Populated dynamically -->
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tab 6: ML Prediction -->
+                <div id="tab-ml" class="modal-tab-pane">
+                    <div class="ml-modal-grid">
+                        <div class="ml-summary-box">
+                            <div class="ml-box-title">Random Forest Forecast</div>
+                            <div class="ml-trend-large" id="modal-ml-trend">UPTREND</div>
+                            <div class="ml-conf-large" id="modal-ml-conf">88% Confidence</div>
+                            <p class="ml-box-desc">Trained on 9 statistical technical indicators over historical sessions</p>
+                        </div>
+
+                        <div class="ml-probabilities-box">
+                            <div class="ml-box-title">Next-Day Probability Matrix</div>
+                            <div class="prob-row">
+                                <span>Bullish (Up):</span>
+                                <div class="prob-bar-track">
+                                    <div class="prob-bar-fill up" id="modal-prob-up" style="width: 65%;"></div>
+                                </div>
+                                <span class="prob-val" id="modal-prob-up-val">65%</span>
+                            </div>
+                            <div class="prob-row">
+                                <span>Neutral (Sideways):</span>
+                                <div class="prob-bar-track">
+                                    <div class="prob-bar-fill neutral" id="modal-prob-neutral" style="width: 22%;"></div>
+                                </div>
+                                <span class="prob-val" id="modal-prob-neutral-val">22%</span>
+                            </div>
+                            <div class="prob-row">
+                                <span>Bearish (Down):</span>
+                                <div class="prob-bar-track">
+                                    <div class="prob-bar-fill down" id="modal-prob-down" style="width: 13%;"></div>
+                                </div>
+                                <span class="prob-val" id="modal-prob-down-val">13%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Footer -->
+            <div class="modal-footer">
+                <span class="modal-footer-note">⚡ Real-time Multi-Factor Quantitative Synthesis · 50+ Indicators Verified</span>
+                <button class="action-btn" id="modal-close-action-btn">Done</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mobile Bottom Navigation Bar -->
+    <nav class="mobile-bottom-nav">
+        <button class="bottom-nav-item active" data-view="view-dashboard">
+            <i data-lucide="layout-dashboard"></i>
+            <span>Dashboard</span>
+        </button>
+        <button class="bottom-nav-item" data-view="view-stocks">
+            <i data-lucide="trending-up"></i>
+            <span>Stocks</span>
+        </button>
+        <button class="bottom-nav-item" data-view="view-predictions">
+            <i data-lucide="cpu"></i>
+            <span>AI ML</span>
+        </button>
+        <button class="bottom-nav-item" data-view="view-education">
+            <i data-lucide="book-open"></i>
+            <span>Learn</span>
+        </button>
+        <button class="bottom-nav-item" data-view="view-settings">
+            <i data-lucide="settings"></i>
+            <span>Settings</span>
+        </button>
+    </nav>
+
+    <!-- Application Script -->
+    <script src="script.js"></script>
+</body>
+</html>
